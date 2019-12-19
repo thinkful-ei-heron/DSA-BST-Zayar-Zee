@@ -1,95 +1,93 @@
-const BST = require('./BST_example');
+/*
+What does this program do?
+It sums all the nodes in a BST
+*/
 
-let bst = new BST()
-let bst2 = new BST()
+/* Height of a BST
+Write an algorithm to find the height of a binary search tree.
+What is the run time of your algorithm? O(n), its covering all nodes to find the height
+*/
 
-function tree(t, ) {
-  //Traverses the tree vertically then outputs the node value and then the values of the child nodes
-  if (!t) {
-    return 0;
-  }
-  console.log(t.key)
-  return tree(t.left) + t.value + tree(t.right)
+function bst_height1(tree) {
+  return Math.max(tree.left && bst_height1(tree.left),
+    tree.right && bst_height1(tree.right)) + 1;
 }
 
-let count = 0
+//From a comprehension point of view - this might be easier to understand
+//but they are the same solution
 
-function thirdLargest(t) {
-  if (!t) {
-
-  }
-
-  if (t.right) {
-      thirdLargest(t.right)
-  }
-
-  count += 1
-  if (count === 3) {
-    console.log('result: ', t.key)
-    return
-  }
-
-  if (t.left) {
-    thirdLargest(t.left)
-  }
+function bst_height2(tree) {
+  if (tree.left && tree.right)
+    return Math.max(bst_height2(tree.left),
+      bst_height2(tree.right)) + 1;
+  if (tree.left)
+    return bst_height2(tree.left) + 1;
+  if (tree.right)
+    return bst_height2(tree.right) + 1;
+  return 1;
 }
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/*
+Write an algorithm to check whether an arbitrary binary tree is a binary search tree,
+assuming the tree does not contain duplicates
+*/
 
-function treeHeight(t, depth = 0) {
-  //runtime O(n)
-  if (!t) {
-    return depth;
-  }
-  if (t) {
-    depth += 1
-    return Math.max(
-      treeHeight(t.left, depth),
-      treeHeight(t.right, depth)
-    )
-  }
+//Use an INTEGER.MIN and INTEGER.Max value
 
+//To test if the tree is BST or not - just change the < in the insert method to >
+//and the tree will be flipped and will not be  BST and this function should return false
 
-}
-
-function isBST(t) {
-  if (!t) {
-    return true
-  }
-
-  if (t.left && t.left.key > t.key || t.right && t.right.key < t.key) {
-    return false
-  }
-
-  if (t) {
-    return (isBST(t.left) && isBST(t.right))
-  }
-  return true
-
+function is_bst(tree, minimum, maximum) {
+  if (minimum !== undefined && tree.key < minimum)
+    return false;
+  if (maximum !== undefined && tree.key > maximum)
+    return false;
+  if (tree.left && !is_bst(tree.left, minimum, tree.key))
+    return false;
+  if (tree.right && !is_bst(tree.right, tree.key, maximum))
+    return false;
+  return true;
 }
 
 function main() {
-  // let input1 = [3, 1, 4, 6, 9, 2, 5, 7, 8, 15]
-  let input1 = [3,2,4,1,6,10,7]
-  let input2 = 'EASYQUESTION'.split('')
-
-  input1.forEach((num) => {
-    bst.insert(num)
-  })
-
-  input2.forEach(char => {
-    bst2.insert(char)
-  })
-
-  const notBinary = new BST()
-  notBinary.key = 3
-  notBinary.left = new BST(key = 4, value = null, parent = notBinary)
-  notBinary.right = new BST(key = 2, value = null, parent = notBinary)
-
-  thirdLargest(bst)
-  // tree(bst2)
-  // console.log(treeHeight(bst))
-  // console.log(isBST(bst))
-  // console.log(isBST(notBinary))
-
+  let Min = Number.MIN_VALUE;
+  let Max = Number.MAX_VALUE;
+  is_bst(tree, Min, Max)
 }
 
-main()
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//Write an algorithm to find the third largest value in a binary search tree
+function nth_largest(tree, state) {
+  //Finding the largest node means traversing the right first.
+  if (tree.right) {
+    nth_largest(tree.right, state);
+    if (state.result) return;
+  }
+  if (!--state.n) {
+    //Found it.
+    state.result = tree.key;
+    return;
+  }
+  if (tree.left) nth_largest(tree.left, state);
+}
+
+function third_largest(tree) {
+  //Special case: empty tree.
+  if (tree.key == null)
+    return null;
+  let state = { n: 3, result: null };
+  nth_largest(tree, state);
+  return state.result;
+}
+
+//Implement a function to check if a tree is balanced (i.e. a tree where no two leaves differ
+//in distance from the root by more than one).
+function isBalanced(tree) {
+  if (!tree.left) {
+    return !(tree.right && (tree.right.left || tree.right.right));
+  }
+  if (!tree.right) {
+    return !(tree.left && (tree.left.left || tree.left.right));
+  }
+  return isBalanced(tree.left) && isBalanced(tree.right);
+}
